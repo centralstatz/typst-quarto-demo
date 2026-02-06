@@ -1,0 +1,55 @@
+---
+title: Google Analytics Summary
+subtitle: CentralStatz Statistical & Data Sciences LLC
+date: January 2026
+date-format: "MMMM YYYY"
+format:
+  typst:
+    template-partials: 
+        - typst-show.typ
+        - typst-template.typ
+knitr:
+  opts_chunk:
+    dev: svglite
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  echo = FALSE
+)
+```
+
+This report provides a listing of monthly traffic and the top visited pages to [www.centralstatz.com](www.centralstatz.com).
+
+# Total Visits By Month
+
+This is some text in the body under level 1.
+
+```{=typst} 
+#horline()
+```
+
+## Level 2 Header
+
+This is some text in the body of level 2.
+
+```{r, echo = FALSE}
+
+library(ggplot2)
+trees |>
+    ggplot(
+        aes(
+            x = Height,
+            y = Girth
+        )
+    ) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    theme_minimal()
+```
+
+```{=typst}
+#source_text("Source: Google Analytics")
+```
