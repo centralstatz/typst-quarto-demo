@@ -1,6 +1,6 @@
 ---
-title: Google Analytics Summary
-subtitle: CentralStatz Statistical & Data Sciences LLC
+title: Website Traffic Summary
+subtitle: "www.zajichekstats.com"
 date: January 2026
 date-format: "MMMM YYYY"
 format:

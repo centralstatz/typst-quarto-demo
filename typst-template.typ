@@ -24,17 +24,33 @@ set page(
         width: 100%,
         height: 0.75in,
         outset: (x: 15%),
-        fill: rgb("#a09c21"),
-        pad(top: 16pt, block([
+        fill: rgb("#141413"),
+        pad(top: 15pt, block([
           #grid(
             columns: (75%, 25%),
             align(left)[
-              #text(
-                upper(subtitle),
-                font: "Lantinghei SC",
-                fill: white,
-                weight: "bold",
-              )
+                #grid(
+                  columns: (25%, 20%, 45%),
+                  align(left)[
+                    #text(
+                      "Prepared By:",
+                      font: "Lantinghei SC",
+                      fill: white,
+                      weight: "bold",
+                    )
+                  ],
+                  align(right)[
+                    #image("logo copy.png", width: 1.2in)
+                  ],
+                  align(right)[
+                    #text(
+                      "www.centralstatz.com",
+                      font: "Lantinghei SC",
+                      fill: rgb("#94733f"),
+                      size: 10pt
+                    )
+                  ],
+                )
             ],
             align(right)[
               #text(
@@ -74,25 +90,32 @@ set page(
     align(alignment)[#formatted_heading]
   }
 
-  image("logo.png", width: 1in)
-
   horline()
 
   grid(
-    columns: (80%, 15%, 5%),
-    align(left)[
+    columns: (5%, 45%, 45%, 5%),
+    align(left)[],
+    align(center)[
+      #pad(top: 20pt, block([
+        #text(
+          upper(title),
+          font: "Lantinghei SC",
+          size: 20pt,
+          fill: rgb("#141413"),
+          weight: "bold"
+        )
+      ]))
+    ],
+    align(center)[
+      #image("logo.png", width: 1in),
       #text(
-        upper(title),
+        subtitle,
         font: "Lantinghei SC",
-        size: 20pt,
-        fill: rgb("#141413"),
-        weight: "bold",
+        size: 10pt,
+        fill: rgb("#141413")
       )
     ],
-    align(right)[
-      #image("logo copy.png", width: 1.5in)
-    ],
-    align(right)[],
+    align(left)[]
   )
 
   horline()
