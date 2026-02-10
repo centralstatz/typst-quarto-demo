@@ -21,15 +21,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-This report provides a listing of monthly traffic and the top visited pages to [www.centralstatz.com](www.centralstatz.com).
-
 # Total Visits By Month
 
 This is some text in the body under level 1.
-
-```{=typst} 
-#horline()
-```
 
 ## Level 2 Header
 

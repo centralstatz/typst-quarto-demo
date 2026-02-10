@@ -8,7 +8,7 @@
     )]
 }
 
-#let horline() = { line(length: 100%, stroke: 2pt + rgb("#94733f")) }
+#let horline() = { line(length: 100%, stroke: 20pt + rgb("#36637d")) }
 
 #let report(
   title: none,
@@ -96,7 +96,7 @@ set page(
     columns: (5%, 45%, 45%, 5%),
     align(left)[],
     align(center)[
-      #pad(top: 20pt, block([
+      #pad(top: 15pt, block([
         #text(
           upper(title),
           font: "Lantinghei SC",
@@ -107,11 +107,12 @@ set page(
       ]))
     ],
     align(center)[
-      #image("logo.png", width: 1in),
+      #image("logo.png", width: 1in)
+      #v(-10pt)
       #text(
         subtitle,
-        font: "Lantinghei SC",
-        size: 10pt,
+        font: "Lao MN",
+        size: 8pt,
         fill: rgb("#141413")
       )
     ],
