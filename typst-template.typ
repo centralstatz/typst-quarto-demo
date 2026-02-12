@@ -1,3 +1,27 @@
+#let status-box(top-box-text: "", bottom-box-text: none, top-fill: rgb("#36637d")) = {
+  let top_box = box(
+    width: 2in,
+    height: 0.7in,
+    fill: top-fill,
+    inset: 6pt,
+    align(center + horizon)[
+      #text(fill: white, weight: "bold", size: 14pt)[#top-box-text]
+    ],
+  )
+
+  let bottom_box = box(
+    width: 2in,
+    height: 0.7in,
+    fill: top-fill.lighten(80%),
+    inset: 6pt,
+    align(center + horizon)[
+      #text(fill: black, size: 14pt)[#bottom-box-text]
+    ],
+  )
+
+  stack(top_box, bottom_box, spacing: 0pt)
+}
+
 #let source_text(source_info) = {
   align(right)[
     #text(
@@ -40,13 +64,14 @@ set page(
                     )
                   ],
                   align(right)[
+                    #v(-5pt)
                     #image("logo copy.png", width: 1.2in)
                   ],
                   align(right)[
                     #text(
                       "www.centralstatz.com",
                       font: "Lantinghei SC",
-                      fill: rgb("#94733f"),
+                      fill: white,
                       size: 10pt
                     )
                   ],
@@ -108,7 +133,7 @@ set page(
     ],
     align(center)[
       #image("logo.png", width: 1in)
-      #v(-10pt)
+      #v(-15pt)
       #text(
         subtitle,
         font: "Lao MN",

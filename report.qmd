@@ -1,6 +1,6 @@
 ---
 title: Website Traffic Summary
-subtitle: "www.zajichekstats.com"
+subtitle: "zajichekstats.com"
 date: January 2026
 date-format: "MMMM YYYY"
 format:
@@ -20,6 +20,36 @@ knitr::opts_chunk$set(
   echo = FALSE
 )
 ```
+
+:::{layout-ncol=3}
+
+```{=typst}
+#status-box(
+   top-box-text: "Total Views", 
+   bottom-box-text: [`r format(13435, big.mark = ",")`],
+   top-fill: rgb("#c9b638")
+   )
+```
+
+```{=typst}
+#status-box(
+   top-box-text: "Average Session Duration", 
+   bottom-box-text: [`r paste0(1.43, " minutes")`],
+   top-fill: rgb("#36637d")
+   )
+```
+
+```{=typst}
+#status-box(
+   top-box-text: "Engaged Session Rate", 
+   bottom-box-text: [`r paste0(54.3, "%")`],
+   top-fill: rgb("#cbcbcb")
+   )
+```
+
+:::
+
+<div style="background-color: #f0eeeeff;">
 
 # Total Visits By Month
 
@@ -47,3 +77,5 @@ trees |>
 ```{=typst}
 #source_text("Source: Google Analytics")
 ```
+
+</div>
