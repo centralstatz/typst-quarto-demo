@@ -49,33 +49,89 @@ knitr::opts_chunk$set(
 
 :::
 
+```{r, out.width="100%"}
+
+library(tidyverse)
+day_range <- 0:365
+temp_dat <-
+  tibble(
+    date = Sys.Date() - days(day_range),
+    Users = sample(1:100, size = length(day_range), replace = TRUE),
+    Views = sample(25:200, size = length(day_range), replace = TRUE)
+  )
+
+temp_dat |> 
+
+  # Send down the rows
+  pivot_longer(
+    cols = -date,
+    names_to = "Metric",
+    values_to = "Value"
+  ) |>
+  
+  # Get month
+  mutate(date = floor_date(date, unit = "month")) |>
+  
+  # Aggregate
+  summarize(
+    Value = sum(Value),
+    .by = 
+      c(
+        date,
+        Metric
+      )
+  ) |>
+  
+  # Add group
+  add_column(Granularity = "Monthly") |>
+  
+  # Make a plot
+  ggplot(
+    aes(
+      x = date,
+      y = Value,
+      color = Metric
+    )
+  ) +
+  geom_line() +
+  geom_point() + 
+  geom_line(
+    data = 
+    temp_dat |> 
+
+    # Send down the rows
+    pivot_longer(
+      cols = -date,
+      names_to = "Metric",
+      values_to = "Value"
+    ) |>
+    
+    # Indicate group
+    add_column(Granularity = "Daily"),
+    aes(
+      y = Value * 30
+    ),
+    alpha = .15
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 16)
+  ) +
+  scale_x_date(name = "Month", date_labels = "%b %y") +
+  scale_y_continuous(
+    name = "Monthly Count",
+    sec.axis = sec_axis(~./30, name = "Daily Count")
+  ) +
+  scale_color_manual(values = c("#c9b638", "#36637d"))
+
+```
+
 <div style="background-color: #f0eeeeff;">
 
-# Total Visits By Month
-
-This is some text in the body under level 1.
-
-## Level 2 Header
-
-This is some text in the body of level 2.
-
-```{r, echo = FALSE}
-
-library(ggplot2)
-trees |>
-    ggplot(
-        aes(
-            x = Height,
-            y = Girth
-        )
-    ) +
-    geom_point() +
-    geom_smooth(method = "lm") +
-    theme_minimal()
-```
+</div>
 
 ```{=typst}
 #source_text("Source: Google Analytics")
 ```
-
-</div>

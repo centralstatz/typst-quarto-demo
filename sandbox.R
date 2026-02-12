@@ -41,3 +41,71 @@ metric_by_date <-
 # Show time series of monthly views across page (views and users separate lines)
 
 # Side by side showing top 5 pages by views; map by location
+
+day_range <- 0:365
+temp_dat <-
+  tibble(
+    date = Sys.Date() - days(day_range),
+    Users = sample(1:100, size = length(day_range), replace = TRUE),
+    Views = sample(25:200, size = length(day_range), replace = TRUE)
+  )
+
+temp_dat |>
+
+  # Send down the rows
+  pivot_longer(
+    cols = -date,
+    names_to = "Metric",
+    values_to = "Value"
+  ) |>
+
+  # Get month
+  mutate(date = floor_date(date, unit = "month")) |>
+
+  # Aggregate
+  summarize(
+    Value = sum(Value),
+    .by = c(
+      date,
+      Metric
+    )
+  ) |>
+
+  # Add group
+  add_column(Granularity = "Monthly") |>
+
+  # Make a plot
+  ggplot(
+    aes(
+      x = date,
+      y = Value,
+      color = Metric
+    )
+  ) +
+  geom_line() +
+  geom_point() +
+  geom_line(
+    data = temp_dat |>
+
+      # Send down the rows
+      pivot_longer(
+        cols = -date,
+        names_to = "Metric",
+        values_to = "Value"
+      ) |>
+
+      # Indicate group
+      add_column(Granularity = "Daily"),
+    aes(
+      y = Value * 30
+    ),
+    alpha = .15
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    legend.title = element_blank()
+  ) +
+  scale_x_date(name = "Month", date_labels = "%b %y") +
+  ylab("Count") +
+  scale_color_manual(values = c("#c9b638", "#36637d"))

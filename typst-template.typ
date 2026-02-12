@@ -41,6 +41,13 @@
   content,
 ) = {
 set page(
+      background: [
+      opacity(8%)[
+        align(center)[
+          #image("background.png", width: 100%, height: 100%)
+        ]
+      ]
+    ],
     paper: "us-letter",
     margin: (top: 0.5in, bottom: 1in, x: 0.75in),
     footer: {
