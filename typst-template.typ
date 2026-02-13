@@ -32,7 +32,7 @@
     )]
 }
 
-#let horline() = { line(length: 100%, stroke: 20pt + rgb("#36637d")) }
+#let horline() = { line(length: 100%, stroke: 10pt + rgb("#36637d")) }
 
 #let report(
   title: none,
@@ -84,13 +84,16 @@ set page(
                   ],
                 )
             ],
-            align(right)[
+            align(left)[
+              #v(-5pt)
               #text(
-                upper(date),
                 font: "Lantinghei SC",
                 fill: white,
                 weight: "bold",
-              )
+              )[
+                As of: \
+                #date
+              ]
             ],
           )
         ])),

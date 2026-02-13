@@ -1,8 +1,8 @@
 ---
 title: Website Traffic Summary
 subtitle: "zajichekstats.com"
-date: January 2026
-date-format: "MMMM YYYY"
+date: "`r Sys.time()`"
+date-format: "MM/D/YYYY h:mm A"
 format:
   typst:
     template-partials: 
@@ -21,20 +21,88 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r}
+# Load packages
+library(tidyverse)
+library(googleAnalyticsR)
+library(gt)
+
+# Connect to GA
+ga_auth(json_file = "credentials.json")
+
+# Extract property info
+my_account <- ga_account_list("ga4")
+
+# Extract the property I want
+my_prop <- my_account |>
+  filter(property_name == "zajichekstats") |>
+  pull("propertyId")
+
+# Set date range
+date_end <- Sys.Date()
+date_start <- date_end - years(1)
+
+# ga_meta(propertyId = my_prop, version = "data") |> View()
+
+# Extract metrics by calendar date
+metric_by_date <-
+  ga_data(
+    propertyId = my_prop,
+    metrics = c(
+      "totalUsers",
+      "screenPageViews",
+      "sessions",
+      "engagedSessions",
+      "averageSessionDuration"
+    ),
+    dimensions = "date",
+    date_range = c(date_start, date_end) |> as.character(),
+    limit = -1
+  )
+
+## KPI's
+
+# Total views
+total_views <- sum(metric_by_date$screenPageViews)
+
+# Average duration
+decimal_duration <- sum(
+  metric_by_date$averageSessionDuration * metric_by_date$sessions
+) /
+  sum(metric_by_date$sessions) /
+  60
+duration_minutes <- floor(decimal_duration)
+duration_seconds <- round((decimal_duration - duration_minutes) * 60)
+duration_seconds <- ifelse(
+  nchar(duration_seconds) == 1,
+  paste0("0", duration_seconds),
+  as.character(duration_seconds)
+)
+average_duration <- paste0(duration_minutes, ":", duration_seconds)
+
+# Engaged session rate
+engaged_session_rate <- sum(metric_by_date$engagedSessions) /
+  sum(metric_by_date$sessions)
+engaged_session_rate <- paste0(round(100 * engaged_session_rate, 1), "%")
+
+```
+
+## In the past year
+
 :::{layout-ncol=3}
 
 ```{=typst}
 #status-box(
    top-box-text: "Total Views", 
-   bottom-box-text: [`r format(13435, big.mark = ",")`],
+   bottom-box-text: [`r format(total_views, big.mark = ",")`],
    top-fill: rgb("#c9b638")
    )
 ```
 
 ```{=typst}
 #status-box(
-   top-box-text: "Average Session Duration", 
-   bottom-box-text: [`r paste0(1.43, " minutes")`],
+   top-box-text: "Average Session Duration (minutes)", 
+   bottom-box-text: [`r average_duration`],
    top-fill: rgb("#36637d")
    )
 ```
@@ -42,25 +110,27 @@ knitr::opts_chunk$set(
 ```{=typst}
 #status-box(
    top-box-text: "Engaged Session Rate", 
-   bottom-box-text: [`r paste0(54.3, "%")`],
+   bottom-box-text: [`r engaged_session_rate`],
    top-fill: rgb("#cbcbcb")
    )
 ```
 
 :::
 
-```{r, out.width="100%"}
+```{r, out.width="100%", fig.height=1.75}
+## Views over time
 
-library(tidyverse)
-day_range <- 0:365
-temp_dat <-
-  tibble(
-    date = Sys.Date() - days(day_range),
-    Users = sample(1:100, size = length(day_range), replace = TRUE),
-    Views = sample(25:200, size = length(day_range), replace = TRUE)
+# Make intermediate dataset
+temp_views <- 
+  metric_by_date |>
+  select(
+    date,
+    Users = totalUsers,
+    Views = screenPageViews
   )
 
-temp_dat |> 
+# Make graph
+temp_views |> 
 
   # Send down the rows
   pivot_longer(
@@ -97,40 +167,108 @@ temp_dat |>
   geom_point() + 
   geom_line(
     data = 
-    temp_dat |> 
+      temp_views |> 
 
-    # Send down the rows
-    pivot_longer(
-      cols = -date,
-      names_to = "Metric",
-      values_to = "Value"
-    ) |>
-    
-    # Indicate group
-    add_column(Granularity = "Daily"),
+      # Send down the rows
+      pivot_longer(
+        cols = -date,
+        names_to = "Metric",
+        values_to = "Value"
+      ) |>
+      
+      # Indicate group
+      add_column(Granularity = "Daily"),
     aes(
-      y = Value * 30
+      y = Value * 20
     ),
-    alpha = .15
+    alpha = .25
   ) +
   theme_minimal() +
   theme(
-    legend.position = "top",
+    legend.position = "right",
     legend.title = element_blank(),
-    legend.text = element_text(size = 16)
+    legend.text = element_text(size = 12)
   ) +
   scale_x_date(name = "Month", date_labels = "%b %y") +
   scale_y_continuous(
     name = "Monthly Count",
-    sec.axis = sec_axis(~./30, name = "Daily Count")
+    sec.axis = sec_axis(~./20, name = "Daily Count")
   ) +
   scale_color_manual(values = c("#c9b638", "#36637d"))
 
 ```
 
-<div style="background-color: #f0eeeeff;">
+```{r}
+# Text
+views_per_month <-
+  temp_views |>
 
-</div>
+  # Get month
+  mutate(date = floor_date(date, unit = "month")) |>
+
+  # Aggregate
+  summarize(
+    Views = sum(Views),
+    .by = date
+  ) |>
+  with(data = _, mean(Views))
+```
+
+There are approximately `r round(views_per_month)` views per month on average, with skyrocketing views on some individual days.
+
+### Top Blog Posts
+
+```{r}
+## Top 5 pages
+top_pages <-
+  ga_data(
+    propertyId = my_prop,
+    metrics = "screenPageViews",
+    dimensions = c("unifiedPagePathScreen", "unifiedScreenName"),
+    date_range = c(date_start, date_end) |> as.character(),
+    limit = -1
+  )
+
+top_pages |>
+
+  # Filter to blog post
+  filter(str_detect(unifiedPagePathScreen, "^[/]post[/]")) |>
+
+  # Clean names
+  mutate(
+    Label = unifiedScreenName |>
+      str_remove(pattern = " – Zajichek Stats")
+  ) |>
+
+  # Combine
+  summarize(
+    Views = sum(screenPageViews),
+    .by = Label
+  ) |>
+
+  # Make rate
+  mutate(
+    Percent = Views / sum(Views)
+  ) |>
+
+  # Keep top 5 rows
+  slice_max(
+    order_by = Views,
+    n = 5,
+    with_ties = FALSE
+  ) |>
+
+  # Make a table
+  gt() |>
+  cols_label(
+    Label = "Title",
+    Percent = "% of Total Views"
+  ) |>
+  fmt_percent(
+    columns = Percent,
+    decimals = 1
+  )
+```
 
 ```{=typst}
 #source_text("Source: Google Analytics")
